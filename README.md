@@ -1,6 +1,6 @@
 # POC - Cerrar Ventanas Hijas en JavaScript
 
-Este proyecto es una prueba de concepto que demuestra cómo abrir múltiples ventanas hijas desde una página padre en un navegador y cómo cerrar cada ventana hija utilizando su título (`document.title`) como criterio. A continuación, se explica el funcionamiento del código y cómo probarlo.
+Esta POC demuestra cómo abrir múltiples ventanas hijas desde una página padre en un navegador y cómo cerrar cada ventana hija utilizando su título (`document.title`) como criterio. A continuación, se explica el funcionamiento del código y cómo probarlo.
 
 ---
 
