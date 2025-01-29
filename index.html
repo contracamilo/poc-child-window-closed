@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Padre</title>
+</head>
+<body>
+    <h1>Página Padre</h1>
+    <button id="abrirVentana">Abrir Ventana Hija</button>
+    <div id="botonesCierre"></div>
+
+    <script>
+        // Función para abrir una ventana hija
+        function abrirVentanaHija() {
+            // Abrir una ventana hija vacía
+            const ventanaHija = window.open('', '_blank', 'width=400,height=300');
+
+            // Asignar un título único a la ventana hija
+            const titulo = `Ventana Hija ${Math.random().toString(36).substr(2, 9)}`;
+            ventanaHija.document.title = titulo;
+
+            // Crear un botón de cierre en la página padre
+            const botonCierre = document.createElement('button');
+            botonCierre.textContent = `Cerrar ${titulo}`;
+            botonCierre.onclick = () => {
+                // Cerrar la ventana hija usando el título como criterio
+                if (ventanaHija && !ventanaHija.closed) {
+                    ventanaHija.close();
+                }
+                // Eliminar el botón de cierre
+                botonCierre.remove();
+            };
+
+            // Agregar el botón al contenedor
+            document.getElementById('botonesCierre').appendChild(botonCierre);
+        }
+
+        // Asignar la función al botón de abrir ventana
+        document.getElementById('abrirVentana').onclick = abrirVentanaHija;
+    </script>
+</body>
+</html>
