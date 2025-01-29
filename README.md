@@ -1,4 +1,4 @@
-# README: Prueba de Concepto - Abrir y Cerrar Ventanas Hijas en JavaScript
+# POC - Cerrar Ventanas Hijas en JavaScript
 
 Este proyecto es una prueba de concepto que demuestra cómo abrir múltiples ventanas hijas desde una página padre en un navegador y cómo cerrar cada ventana hija utilizando su título (`document.title`) como criterio. A continuación, se explica el funcionamiento del código y cómo probarlo.
 
@@ -66,9 +66,9 @@ El proyecto consta de un único archivo HTML que contiene tanto la interfaz de u
 
 ## Conclusión
 
-Este proyecto es una demostración sencilla pero efectiva de cómo abrir y cerrar ventanas hijas desde una página padre utilizando JavaScript. Es ideal para entender conceptos básicos de manipulación del DOM y manejo de ventanas en el navegador.
+Este PCO es una demostración sencilla pero efectiva de cómo abrir y cerrar ventanas hijas desde una página padre utilizando JavaScript. Es ideal para entender conceptos básicos de manipulación del DOM y manejo de ventanas en el navegador.
 
-¡Siéntete libre de modificar y expandir este código según tus necesidades! 😊
+
 
 ---
 
