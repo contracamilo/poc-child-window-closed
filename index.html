@@ -1,43 +1,108 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Padre</title>
+  <meta charset="UTF-8">
+  <title>Página Principal</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .registered-windows { margin-top: 20px; }
+    .close-window { margin-top: 20px; }
+  </style>
 </head>
 <body>
-    <h1>Página Padre</h1>
-    <button id="abrirVentana">Abrir Ventana Hija</button>
-    <div id="botonesCierre"></div>
+  <h1>Página Principal</h1>
+  
+  <!-- Botón para generar (abrir) una ventana secundaria -->
+  <button id="abrirSecundaria">Abrir Ventana Secundaria</button>
+  
+  <!-- Sección para listar las ventanas secundarias registradas -->
+  <div class="registered-windows">
+    <h3>Ventanas secundarias registradas:</h3>
+    <ul id="listaVentanas"></ul>
+  </div>
+  
+  <!-- Sección para enviar la orden de cierre -->
+  <div class="close-window">
+    <h3>Cerrar ventana secundaria</h3>
+    <input type="text" id="windowIdToClose" placeholder="Ingrese windowId">
+    <button id="cerrarVentana">Cerrar Ventana</button>
+  </div>
 
-    <script>
-        // Función para abrir una ventana hija
-        function abrirVentanaHija() {
-            // Abrir una ventana hija vacía
-            const ventanaHija = window.open('', '_blank');
+  <script>
+    // Objeto para almacenar las referencias a las ventanas secundarias registradas
+    const ventanasSecundarias = {};
 
-            // Asignar un título único a la ventana hija
-            const titulo = `Ventana Hija ${Math.random().toString(36).substr(2, 9)}`;
-            ventanaHija.document.title = titulo;
+    // Bandera para saber si el listener está registrado
+    let listenerRegistrado = false;
 
-            // Crear un botón de cierre en la página padre
-            const botonCierre = document.createElement('button');
-            botonCierre.textContent = `Cerrar ${titulo}`;
-            botonCierre.onclick = () => {
-                // Cerrar la ventana hija usando el título como criterio
-                if (ventanaHija && !ventanaHija.closed) {
-                    ventanaHija.close();
-                }
-                // Eliminar el botón de cierre
-                botonCierre.remove();
-            };
+    // Función que maneja los mensajes entrantes
+    function handleMessage(event) {
+      // Verificar el origen; en esta prueba usamos location.origin
+      if (event.origin !== location.origin) return;
+      
+      console.log("Mensaje recibido en la página principal:", event.data);
+      
+      // Se espera recibir: { type: 'secondary-open', windowId: 'valor_unico' }
+      if (event.data && event.data.type === 'secondary-open' && event.data.windowId) {
+        // Registrar la ventana secundaria usando event.source
+        ventanasSecundarias[event.data.windowId] = event.source;
+        
+        // Actualizar la lista en el DOM para visualizar el windowId registrado
+        const li = document.createElement('li');
+        li.textContent = `windowId: ${event.data.windowId}`;
+        li.id = 'ventana-' + event.data.windowId;
+        document.getElementById('listaVentanas').appendChild(li);
+      }
+    }
 
-            // Agregar el botón al contenedor
-            document.getElementById('botonesCierre').appendChild(botonCierre);
-        }
+    // Función para registrar el listener de mensajes si aún no está agregado
+    function registrarListener() {
+      if (!listenerRegistrado) {
+        window.addEventListener('message', handleMessage);
+        listenerRegistrado = true;
+        console.log('Listener de mensajes registrado.');
+      }
+    }
 
-        // Asignar la función al botón de abrir ventana
-        document.getElementById('abrirVentana').onclick = abrirVentanaHija;
-    </script>
+    // Función para remover el listener si no hay ventanas secundarias abiertas
+    function removerListenerSiNoHayVentanas() {
+      if (Object.keys(ventanasSecundarias).length === 0 && listenerRegistrado) {
+        window.removeEventListener('message', handleMessage);
+        listenerRegistrado = false;
+        console.log('No hay ventanas abiertas, se removió el listener de mensajes.');
+      }
+    }
+
+    // Al hacer clic en el botón "Abrir Ventana Secundaria"
+    document.getElementById('abrirSecundaria').addEventListener('click', () => {
+      // Asegurarse de que el listener esté registrado
+      registrarListener();
+
+      // La página principal genera la ventana secundaria.
+      // Al no especificar dimensiones, se abrirá en una nueva pestaña o en el marco normal del navegador.
+      window.open('secondary.html', '_blank');
+      // La ventana secundaria se encargará de notificarse a sí misma.
+    });
+
+    // Al hacer clic en el botón "Cerrar Ventana"
+    document.getElementById('cerrarVentana').addEventListener('click', () => {
+      const windowId = document.getElementById('windowIdToClose').value.trim();
+      if (ventanasSecundarias[windowId]) {
+        // Enviar mensaje a la ventana secundaria para que se cierre
+        ventanasSecundarias[windowId].postMessage({ type: 'close-window' }, location.origin);
+        
+        // Eliminar la referencia y actualizar la lista en el DOM
+        delete ventanasSecundarias[windowId];
+        const li = document.getElementById('ventana-' + windowId);
+        if (li) li.remove();
+        console.log(`Se ha enviado la orden de cierre a la ventana con ID: ${windowId}`);
+
+        // Remover el listener si ya no quedan ventanas registradas
+        removerListenerSiNoHayVentanas();
+      } else {
+        console.log(`No se encontró una ventana registrada con windowId: ${windowId}`);
+      }
+    });
+  </script>
 </body>
 </html>
