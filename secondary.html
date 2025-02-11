@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Página Secundaria</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+  </style>
+</head>
+<body>
+  <h1>Página Secundaria</h1>
+  <!-- Se muestra el windowId generado -->
+  <p id="info"></p>
+  
+  <script>
+    // Generar un identificador único para esta ventana secundaria
+    const windowId = Date.now().toString();
+    // Mostrar el windowId en pantalla
+    document.getElementById('info').textContent = 'Mi windowId es: ' + windowId;
+
+    // Notificar a la página principal (window.opener) que esta ventana está abierta,
+    // enviando el windowId para su registro.
+    if (window.opener) {
+      window.opener.postMessage({ type: 'secondary-open', windowId: windowId }, location.origin);
+      console.log('Notificación enviada a la página principal con windowId:', windowId);
+    }
+
+    // Escuchar mensajes entrantes para detectar la orden de cierre
+    window.addEventListener('message', (event) => {
+      // Verificar el origen; usamos location.origin en esta prueba
+      if (event.origin !== location.origin) return;
+      
+      console.log("Mensaje recibido en la secundaria:", event.data);
+      if (event.data && event.data.type === 'close-window') {
+        console.log('Orden de cierre recibida, cerrando la ventana...');
+        window.close();
+      }
+    });
+  </script>
+</body>
+</html>
